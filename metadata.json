@@ -1,0 +1,6 @@
+{
+  "name": "WristFit AI",
+  "description": "AI Virtual Try-On for watches and wrist accessories with instant PromptPay top-ups and admin management.",
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"],
+  "permissions": []
+}

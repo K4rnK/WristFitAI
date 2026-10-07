@@ -328,39 +328,17 @@ export default function App() {
     setResultImage(null);
 
     try {
-      const apiKey = "";
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
-
-      const base64Wrist = wristImage.split(',')[1];
-      const base64Acc = accessoryImage.split(',')[1];
-
-      const prompt = "Synthesize these two images: Place the accessory (watch/bracelet) from the second image seamlessly and accurately onto the wrist in the first image. Make sure lighting, skin texture, perspective, shadows, and reflection look realistic and natural on the wrist.";
-
-      const payload = {
-        contents: [{
-          role: "user",
-          parts: [
-            { text: prompt },
-            { inlineData: { mimeType: "image/jpeg", data: base64Wrist } },
-            { inlineData: { mimeType: "image/jpeg", data: base64Acc } }
-          ]
-        }],
-        generationConfig: {
-          responseModalities: ['IMAGE']
-        }
-      };
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/generate-tryon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ wristImage, accessoryImage })
       });
 
       const result = await response.json();
-      const generatedPart = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
 
-      if (generatedPart && generatedPart.inlineData?.data) {
-        setResultImage(`data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`);
+      if (result && result.image) {
+        setResultImage(result.image);
+        showToast("สร้างภาพเสมือนจริงเสร็จสิ้น!");
       } else {
         setResultImage(wristImage); 
         showToast("สร้างภาพเสมือนจริงเสร็จสิ้น!");
@@ -538,7 +516,7 @@ export default function App() {
   };
 
   const handleDeleteUser = async (targetUser) => {
-    if (!window.confirm(`ต้องการลบผู้ใช้ ${targetUser.username} ใช่หรือไม่? การลบจะไม่สามารถย้อนกลับได้`)) return;
+    // In-app direct delete with confirmation toast (avoiding window.confirm iframe restriction)
     const storedUsers = JSON.parse(localStorage.getItem('wristfit_db_users') || '{}');
     delete storedUsers[targetUser.username];
     localStorage.setItem('wristfit_db_users', JSON.stringify(storedUsers));
@@ -990,7 +968,7 @@ export default function App() {
                       </td>
                     </tr>
                   ))}
-                  {paymentRequests.length === 0 && <tr><td colSpan="6" className="px-4 py-8 text-center text-neutral-500">ยังไม่มีรายการเติมเงิน</td></tr>}
+                  {paymentRequests.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-neutral-500">ยังไม่มีรายการเติมเงิน</td></tr>}
                 </tbody>
               </table>
             </div>
